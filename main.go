@@ -9,13 +9,11 @@ import (
 )
 
 func Calc(expression string) (float64, error) {
-	// Парсим выражение
 	node, err := parser.ParseExpr(expression)
 	if err != nil {
 		return 0, err
 	}
 
-	// Вычисляем значение выражения
 	result, err := eval(node)
 	if err != nil {
 		return 0, err
@@ -24,7 +22,6 @@ func Calc(expression string) (float64, error) {
 	return result, nil
 }
 
-// eval - вспомогательная функция для вычисления значения выражения
 func eval(node ast.Node) (float64, error) {
 	switch n := node.(type) {
 	case *ast.BasicLit:
@@ -54,17 +51,19 @@ func eval(node ast.Node) (float64, error) {
 		default:
 			return 0, fmt.Errorf("unsupported operation")
 		}
+	case *ast.ParenExpr:
+		return eval(n.X)
 	default:
-		return 0, fmt.Errorf("unsupported expression type")
+		return 0, fmt.Errorf("unsupported expression type: %T", n)
 	}
 }
 
 func main() {
-	expr := "3 + 5 * 2 - 8"
+	expr := "(1/2) * 2"
 	result, err := Calc(expr)
 	if err != nil {
-		fmt.Println("Error:", err)
+		fmt.Println(err)
 	} else {
-		fmt.Println("Result:", result)
+		fmt.Println(result)
 	}
 }
